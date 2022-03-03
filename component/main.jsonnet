@@ -33,10 +33,17 @@ local configmap = kube.ConfigMap(app_name) {
   },
 };
 
-local secret = kube.Secret(app_name) {
+local secrets = kube.Secret(app_name) {
   stringData: {
     [s]: params.secrets[s]
     for s in std.objectFields(params.secrets)
+  },
+};
+
+local certificates = kube.Secret(app_name + '-certs') {
+  stringData: {
+    [s]: params.certificates[s]
+    for s in std.objectFields(params.certificates)
   },
 };
 
@@ -90,6 +97,9 @@ local statefulset = kube.StatefulSet(app_name) {
             volumeMounts_:: {
               buffer: { mountPath: '/fluentd/log/' },
               'fluentd-config': { readOnly: true, mountPath: '/fluentd/etc' },
+            } + {
+              [mount]: params.volume_mounts[mount]
+              for mount in std.objectFields(params.volume_mounts)
             },
           },
         },
@@ -98,6 +108,9 @@ local statefulset = kube.StatefulSet(app_name) {
             { emptyDir: {} },
           'fluentd-config':
             { configMap: { name: app_name, items: [ { key: 'td-agent.conf', path: 'fluent.conf' } ], defaultMode: 420, optional: true } },
+        } + {
+          [vol]: params.volumes[vol]
+          for vol in std.objectFields(params.volumes)
         },
       },
     },
@@ -117,8 +130,9 @@ local service = kube.Service(app_name) {
 {
   [if params.namespace != 'openshift-logging' then '00_namespace']: namespace,
   '11_serviceaccount': serviceaccount,
-  '12_configmap': configmap,
-  '13_secret': secret,
+  [if std.length(params.env) > 0 then '12_configmap']: configmap,
+  [if std.length(params.secrets) > 0 then '13_secret']: secrets,
+  [if std.length(params.certificates) > 0 then '14_certificates']: certificates,
   '21_statefulset': statefulset,
   '22_service': service,
 }

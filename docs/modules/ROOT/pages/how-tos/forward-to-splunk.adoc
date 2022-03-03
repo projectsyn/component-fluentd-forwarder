@@ -1,0 +1,91 @@
+= Howto forward to Splunk Server
+
+== Configuration
+
+The configuration of the component is very versatile and depends on how you intend to use it.
+Using environment variables allows you to easily adapt to multi cluster setups.
+[source,yaml]
+----
+env:
+  splunk_protocol: https
+  splunk_insecure: 'false'
+  splunk_host: <SPLUNK_SERVER_URL>
+  splunk_sourcetype: openshift:unknown
+  splunk_source: openshift
+  splunk_index: idx_openshift
+  splunk_port: '8088'
+  splunk_ssl_verify: 'true'
+
+secrets:
+  shared_key: '?{vaultkv:${cluster:tenant}/${cluster:name}/fluentd-forwarder/${_instance}/sharedkey}'
+  splunk_token: '?{vaultkv:${cluster:tenant}/${cluster:name}/fluentd-forwarder/${_instance}/hec_token}'
+----
+
+Fluentd configuration for forwarding to a Splunk server.
+[source,yaml]
+----
+config: |
+  <system>
+    log_level info
+  </system>
+  <source>
+    @type  forward
+    @id    input1
+    port   24224
+    <security>
+      shared_key "#{ENV['SHARED_KEY'] }"
+      self_hostname "#{ENV['HOSTNAME']}"
+    </security>
+  </source>
+  <match **>
+    @type splunk_hec
+    protocol "#{ENV['SPLUNK_PROTOCOL'] }"
+    insecure_ssl "#{ENV['SPLUNK_INSECURE'] }"
+    hec_host "#{ENV['SPLUNK_HOST'] }"
+    sourcetype "#{ENV['SPLUNK_SOURCETYPE'] }"
+    source "#{ENV['SPLUNK_SOURCE'] }"
+    index "#{ENV['SPLUNK_INDEX'] }"
+    hec_port "#{ENV['SPLUNK_PORT'] }"
+    hec_token "#{ENV['SPLUNK_TOKEN'] }"
+    host "#{ENV['NODE_NAME']}"
+    ssl_verify "#{ENV['SPLUNK_SSL_VERIFY']}"
+    ca_file /secret/splunk/splunk-ca.crt
+    <buffer>
+          @type memory
+          chunk_limit_records 100000
+          chunk_limit_size 200m
+          flush_interval 5s
+          flush_thread_count 1
+          overflow_action block
+          retry_max_times 3
+          total_limit_size 600m
+    </buffer>
+  </match>
+----
+
+To connect to the Splunk server and verify its tls certificate add the certificates to the config.
+[source,yaml]
+----
+certificates:
+  splunk-ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+----
+
+And mount it to the stateful set.
+[source,yaml]
+----
+volumes:
+  splunk-certs:
+    secret:
+      secretName: splunk-forwarder,
+      items:
+      - key: splunk-ca.crt
+        path: splunk-ca.crt
+
+volume_mounts:
+  splunk-certs:
+    readOnly: true
+    mountPath: /secret/splunk
+----

@@ -26,6 +26,12 @@ parameters:
 
     secrets: {}
 
+    certificates: {}
+
     config_vars: {}
 
     config: ""
+
+    volumes: {}
+
+    volume_mounts: {}

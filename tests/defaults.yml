@@ -61,3 +61,19 @@ parameters:
         %(match_tmpl)s/
         path test/prod-vshn-zrh-tg-mt-07c9725629384b6b/
       </match>
+
+    certificates:
+      splunk-ca.crt: '?{vaultkv:${cluster:tenant}/${cluster:name}/fluentd-forwarder/${_instance}/splunk_ca}'
+
+    volumes:
+      splunk-certs:
+        secret:
+          secretName: fluentd-forwarder-certs,
+          items:
+            - key: splunk-ca.crt
+              path: splunk-ca.crt
+
+    volume_mounts:
+      splunk-certs:
+        readOnly: true
+        mountPath: /secret/splunk
