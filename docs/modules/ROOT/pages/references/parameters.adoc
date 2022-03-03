@@ -104,7 +104,7 @@ config: |
   string value is %(string)s
 ----
 
-See xref:how-tos/forward-to-s3.adoc[Forward to s3] for an example.
+See xref:how-tos/forward-to-s3.adoc[Forward to S3] for an example.
 
 
 == `config`
@@ -120,4 +120,52 @@ config: ""
 
 Config file for fluentd.
 
-See xref:how-tos/forward-to-s3.adoc[Forward to s3] for an example.
+See xref:how-tos/forward-to-s3.adoc[Forward to S3] for an example.
+
+
+== `certificates`
+
+[horizontal]
+type:: string
+default::
++
+[source,yaml]
+----
+certificates: {}
+----
+
+Additional certificates created as secret with a `-certs` suffix.
+
+See xref:how-tos/forward-to-s3.adoc[Forward to Splunk] for an example.
+
+
+== `volumes`
+
+[horizontal]
+type:: string
+default::
++
+[source,yaml]
+----
+volumes: {}
+----
+
+Additional volumes for fluentd.
+
+See xref:how-tos/forward-to-s3.adoc[Forward to Splunk] for an example.
+
+
+== `volume_mounts`
+
+[horizontal]
+type:: string
+default::
++
+[source,yaml]
+----
+volume_mounts: {}
+----
+
+Additional volumes for fluentd.
+
+See xref:how-tos/forward-to-s3.adoc[Forward to Splunk] for an example.

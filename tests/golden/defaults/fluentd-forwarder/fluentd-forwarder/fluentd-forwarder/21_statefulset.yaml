@@ -102,6 +102,9 @@ spec:
             - mountPath: /fluentd/etc
               name: fluentd-config
               readOnly: true
+            - mountPath: /secret/splunk
+              name: splunk-certs
+              readOnly: true
       dnsPolicy: ClusterFirst
       imagePullSecrets: []
       initContainers: []
@@ -121,6 +124,12 @@ spec:
             name: fluentd-forwarder
             optional: true
           name: fluentd-config
+        - name: splunk-certs
+          secret:
+            items:
+              - key: splunk-ca.crt
+                path: splunk-ca.crt
+            secretName: fluentd-forwarder-certs,
   updateStrategy:
     rollingUpdate:
       partition: 0
