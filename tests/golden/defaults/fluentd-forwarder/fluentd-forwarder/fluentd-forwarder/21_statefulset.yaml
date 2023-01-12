@@ -13,7 +13,8 @@ spec:
   serviceName: fluentd-forwarder
   template:
     metadata:
-      annotations: {}
+      annotations:
+        checksum/config: d9e51f1d2adda6e1245568d0e57775fc
       labels:
         name: fluentd-forwarder
     spec:

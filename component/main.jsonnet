@@ -44,6 +44,11 @@ local statefulset = kube.StatefulSet(app_name) {
   spec+: {
     replicas: params.fluentd.replicas,
     template+: {
+      metadata+: {
+        annotations+: {
+          'checksum/config': std.md5(std.manifestJsonMinified(configmap.data)),
+        },
+      },
       spec+: {
         restartPolicy: 'Always',
         terminationGracePeriodSeconds: 30,
