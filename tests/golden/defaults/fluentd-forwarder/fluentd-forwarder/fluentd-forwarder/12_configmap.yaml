@@ -5,17 +5,50 @@ data:
   s3_bucket: hier
   s3_endpoint: da
   s3_interval: 5m
-  td-agent.conf: "<system>\n  log_level \"#{ENV['LOG_LEVEL']}\"\n</system>\n<source>\n\
-    \  @type forward\n  port 24224\n  null\n  <security>\n    shared_key \"#{ENV['SHARED_KEY']}\"\
-    \n    self_hostname \"#{ENV['HOSTNAME']}\"\n  </security>\n</source>\n\n<match\
-    \ kubernetes.**>\n  @type rewrite_tag_filter\n  <rule>\n    key $['kubernetes']['namespace_name']\n\
-    \    pattern ^(.+)$\n    tag kube.$1\n  </rule>\n</match>\n\n<match kube.prod-vshn-zrh-tg-mt-07c9725629384b6b>\n\
-    \  @type s3\n<format>\n  @type json\n</format>\naws_key_id \"#{ENV['S3_ACCESSKEY']}\"\
-    \naws_sec_key \"#{ENV['S3_SECRETKEY']}\"\ns3_bucket \"#{ENV['S3_BUCKET']}\"\n\
-    s3_endpoint \"#{ENV['S3_ENDPOINT']}\"\ntime_slice_format \"#{ENV['OUTPUT_FORMAT']}\"\
-    \n<buffer time>\n  @type memory\n  compress text\n  chunk_limit_size 256m\n  timekey\
-    \ \"#{ENV['S3_INTERVAL']}\"\n  timekey_wait 1m\n  timekey_use_utc true\n</buffer>\n\
-    /\n  path test/prod-vshn-zrh-tg-mt-07c9725629384b6b/\n</match>\n"
+  td-agent.conf: |
+    <system>
+      log_level "#{ENV['LOG_LEVEL']}"
+    </system>
+    <source>
+      @type forward
+      port 24224
+      null
+      <security>
+        shared_key "#{ENV['SHARED_KEY']}"
+        self_hostname "#{ENV['HOSTNAME']}"
+      </security>
+    </source>
+
+    <match kubernetes.**>
+      @type rewrite_tag_filter
+      <rule>
+        key $['kubernetes']['namespace_name']
+        pattern ^(.+)$
+        tag kube.$1
+      </rule>
+    </match>
+
+    <match kube.prod-vshn-zrh-tg-mt-07c9725629384b6b>
+      @type s3
+    <format>
+      @type json
+    </format>
+    aws_key_id "#{ENV['S3_ACCESSKEY']}"
+    aws_sec_key "#{ENV['S3_SECRETKEY']}"
+    s3_bucket "#{ENV['S3_BUCKET']}"
+    s3_endpoint "#{ENV['S3_ENDPOINT']}"
+    time_slice_format "#{ENV['OUTPUT_FORMAT']}"
+    <buffer time>
+      @type memory
+      compress text
+      chunk_limit_size 256m
+      timekey "#{ENV['S3_INTERVAL']}"
+      timekey_wait 1m
+      timekey_use_utc true
+    </buffer>
+    /
+      path test/prod-vshn-zrh-tg-mt-07c9725629384b6b/
+    </match>
 kind: ConfigMap
 metadata:
   annotations: {}

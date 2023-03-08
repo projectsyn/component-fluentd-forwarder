@@ -67,7 +67,7 @@ spec:
                 secretKeyRef:
                   key: shared_key
                   name: fluentd-forwarder
-          image: docker.io/vshn/fluentd-with-plugins:v1.1.0
+          image: docker.io/vshn/fluentd-with-plugins:v1.2.0
           imagePullPolicy: IfNotPresent
           livenessProbe:
             initialDelaySeconds: 10
