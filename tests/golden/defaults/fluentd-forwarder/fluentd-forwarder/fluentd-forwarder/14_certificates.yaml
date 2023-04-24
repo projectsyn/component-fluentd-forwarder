@@ -1,0 +1,11 @@
+apiVersion: v1
+data: {}
+kind: Secret
+metadata:
+  annotations: {}
+  labels:
+    name: fluentd-forwarder-certs
+  name: fluentd-forwarder-certs
+stringData:
+  splunk-ca.crt: t-silent-test-1234/c-green-test-1234/fluentd-forwarder/fluentd-forwarder/splunk_ca
+type: Opaque
