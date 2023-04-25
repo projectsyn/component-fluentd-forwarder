@@ -1,0 +1,45 @@
+= Howto forward to Splunk HEC
+
+== Configuration
+
+[source,yaml]
+----
+secrets:
+  shared_key: '?{vaultkv:${cluster:tenant}/${cluster:name}/fluentd-forwarder/${_instance}/sharedkey}'
+  hec_token: '?{vaultkv:${cluster:tenant}/${cluster:name}/fluentd-forwarder/${_instance}/hectoken}'
+----
+
+Using `config_vars` helps reducing recurring configuration values, for example if you want to filter different namespaces.
+In this example each namespace will be stored in a different directory.
+[source,yaml]
+----
+config: |
+  <system>
+    log_level "info"
+  </system>
+  <source>
+    @type forward
+    port 24224
+    <security>
+      shared_key "#{ENV['SHARED_KEY']}"
+      self_hostname "#{ENV['HOSTNAME']}"
+    </security>
+  </source>
+
+  <match **>
+    @type splunk_hec
+    hec_token "#{ENV['HEC_TOKEN'] }"
+    hec_host <URL_TO_SPLUNK_HEC>
+    insecure_ssl "true"
+    <buffer>
+      @type memory
+      chunk_limit_records 100000
+      chunk_limit_size 200m
+      flush_interval 5s
+      flush_thread_count 1
+      overflow_action block
+      retry_max_times 3
+      total_limit_size 600m
+    </buffer>
+  </match>
+----
