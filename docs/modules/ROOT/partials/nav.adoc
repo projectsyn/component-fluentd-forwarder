@@ -3,7 +3,7 @@
 .Howtos
 
 * xref:how-tos/forward-to-s3.adoc[Forward to S3 Bucket]
-* xref:how-tos/forward-to-splunk.adoc[Forward to Splunk Server] (coming soon)
+* xref:how-tos/forward-to-splunk.adoc[Forward to Splunk Server]
 
 .Technical reference
 
