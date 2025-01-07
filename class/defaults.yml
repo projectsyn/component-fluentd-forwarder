@@ -2,6 +2,7 @@ parameters:
   fluentd_forwarder:
     =_metadata:
       multi_instance: true
+      multi_tenant: true
     namespace: syn-fluentd-forwarder
 
     images:
